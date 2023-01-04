@@ -36,11 +36,11 @@
 		</array>
 		<key>5B066D32-58E2-429B-A9B5-02DF9EF8BE32</key>
 		<array/>
-		<key>BB109933-B33D-4111-8279-D9A7E5D9AF42</key>
+		<key>8B981D76-9875-460D-A9FD-2D6426CCCC45</key>
 		<array>
 			<dict>
 				<key>destinationuid</key>
-				<string>CB17ABD5-0285-49C9-8130-1A378B85B418</string>
+				<string>5B066D32-58E2-429B-A9B5-02DF9EF8BE32</string>
 				<key>modifiers</key>
 				<integer>0</integer>
 				<key>modifiersubtext</key>
@@ -49,11 +49,11 @@
 				<false/>
 			</dict>
 		</array>
-		<key>FDB45671-7671-4BBB-89E4-C32340312D2C</key>
+		<key>BB109933-B33D-4111-8279-D9A7E5D9AF42</key>
 		<array>
 			<dict>
 				<key>destinationuid</key>
-				<string>5B066D32-58E2-429B-A9B5-02DF9EF8BE32</string>
+				<string>CB17ABD5-0285-49C9-8130-1A378B85B418</string>
 				<key>modifiers</key>
 				<integer>0</integer>
 				<key>modifiersubtext</key>
@@ -134,7 +134,7 @@
 				<key>runningsubtext</key>
 				<string></string>
 				<key>script</key>
-				<string>python3 filter.py $template_file
+				<string>python3 dp.py --alfred $template_file
 </string>
 				<key>scriptargtype</key>
 				<integer>1</integer>
@@ -183,20 +183,20 @@
 			<key>config</key>
 			<dict>
 				<key>argumenttype</key>
-				<integer>2</integer>
+				<integer>0</integer>
 				<key>keyword</key>
 				<string>dpsave</string>
 				<key>subtext</key>
-				<string>{var:template_file}</string>
+				<string></string>
 				<key>text</key>
 				<string>Save Current Config as a Template</string>
 				<key>withspace</key>
-				<false/>
+				<true/>
 			</dict>
 			<key>type</key>
 			<string>alfred.workflow.input.keyword</string>
 			<key>uid</key>
-			<string>FDB45671-7671-4BBB-89E4-C32340312D2C</string>
+			<string>8B981D76-9875-460D-A9FD-2D6426CCCC45</string>
 			<key>version</key>
 			<integer>1</integer>
 		</dict>
@@ -208,7 +208,7 @@
 				<key>escaping</key>
 				<integer>102</integer>
 				<key>script</key>
-				<string>python3 dp.py -s $template_file</string>
+				<string>python3 dp.py -n {query} -s $template_file</string>
 				<key>scriptargtype</key>
 				<integer>0</integer>
 				<key>scriptfile</key>
@@ -295,6 +295,13 @@
 			<key>ypos</key>
 			<real>555</real>
 		</dict>
+		<key>8B981D76-9875-460D-A9FD-2D6426CCCC45</key>
+		<dict>
+			<key>xpos</key>
+			<real>130</real>
+			<key>ypos</key>
+			<real>555</real>
+		</dict>
 		<key>BB109933-B33D-4111-8279-D9A7E5D9AF42</key>
 		<dict>
 			<key>xpos</key>
@@ -308,13 +315,6 @@
 			<real>385</real>
 			<key>ypos</key>
 			<real>380</real>
-		</dict>
-		<key>FDB45671-7671-4BBB-89E4-C32340312D2C</key>
-		<dict>
-			<key>xpos</key>
-			<real>135</real>
-			<key>ypos</key>
-			<real>555</real>
 		</dict>
 	</dict>
 	<key>userconfigurationconfig</key>
