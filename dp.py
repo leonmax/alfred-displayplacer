@@ -71,7 +71,16 @@ class Layout:
     def run(self):
         subprocess.run(self.to_command(), shell=True, check=True)
 
-    def switch(self, template_items):
+    def switch(self, template_items, name=None):
+        if name:
+            for t in template_items:
+                if t.name == name:
+                    print(f"Switch to {name}", file=sys.stderr)
+                    return
+            print(f"No template item called {name}", file=sys.stderr)
+            self.configs = t.configs
+            return
+
         if self.footprint == template_items[0].footprint:
             print("switch to 1", file=sys.stderr)
             self.configs = template_items[1].configs
@@ -84,9 +93,11 @@ class Template:
     def __init__(self, template_file) -> None:
         self._template_path = Path(template_file).expanduser()
         
-    def save(self, layout: Layout):
+    def save(self, layout: Layout, name=None):
         self._template_path.parent.mkdir(parents=True, exist_ok=True)
         with self._template_path.open('a') as f:
+            if name:
+                f.write(f"{name} | ")
             f.write(layout.to_command())
             f.write("\n")
 
@@ -129,6 +140,7 @@ def alfred_script_filter(template: Template):
 
 def parse_args():
     parser = argparse.ArgumentParser()
+    parser.add_argument('-n', "--name", type=str, required=False)
     parser.add_argument('-s', "--save", action='store_true')
     parser.add_argument('-p', "--print-only", action='store_true')
     parser.add_argument("--alfred", action='store_true', help="run as alfred script filter")
@@ -145,10 +157,10 @@ def main():
     if args.alfred:
         alfred_script_filter(template)
     elif args.save:
-        template.save(layout)
+        template.save(layout, args.name)
     else:
         template_items = template.load()
-        layout.switch(template_items)
+        layout.switch(template_items, args.name)
         print(layout.to_command())
         if not args.print_only:
             layout.run()
