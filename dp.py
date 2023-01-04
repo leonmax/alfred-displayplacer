@@ -100,39 +100,32 @@ class Template:
                         yield l
 
 
-class Alfred:
-    @staticmethod
-    def _to_alfred_list(raws: Iterator[str]):
-        items = [
-            {
-                "title": "Auto Switch",
-                "subtitle": "Auto switch based on the current config",
-                "arg": "!",
-                "autocomplete": "auto"
-            }
-        ] + [
-            {
-                "title": f"Config {i}",
-                "subtitle": raw,
-                "arg": raw,
-                "autocomplete": i
-            }
-            for i, raw in enumerate(raws)
-        ]
+def alfred_script_filter(template: Template):
+    items = [
+        {
+            "title": "Auto Switch",
+            "subtitle": "Auto switch based on the current config",
+            "arg": "!",
+            "autocomplete": "auto"
+        }
+    ] + [
+        {
+            "title": f"Config {i}",
+            "subtitle": raw,
+            "arg": raw,
+            "autocomplete": i
+        }
+        for i, raw in enumerate(template.load_raw())
+    ]
 
-        return {"items": items}
-
-    @staticmethod
-    def script_filter(template: Template):
-        raws = template.load_raw()
-        print(json.dumps(Alfred._to_alfred_list(raws)))
+    print(json.dumps({"items": items}))
 
 
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('-s', "--save", action='store_true')
-    parser.add_argument('-a', "--alfred", action='store_true', help="run as alfred script filter")
     parser.add_argument('-p', "--print-only", action='store_true')
+    parser.add_argument("--alfred", action='store_true', help="run as alfred script filter")
     parser.add_argument('template_file', nargs='?', type=str, default=f"{CONF_DIR}/templates.txt")
     return parser.parse_args()
 
@@ -144,7 +137,7 @@ def main():
 
     template = Template(args.template_file)
     if args.alfred:
-        Alfred.script_filter(template)
+        alfred_script_filter(template)
     elif args.save:
         template.save(layout)
     else:
