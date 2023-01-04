@@ -51,14 +51,15 @@ class Layout:
     Layout is a group of configs
     """
     configs: List[Config]
+    name: str = None
 
     @staticmethod
-    def parse(value):
+    def parse(value, name=None):
         configs = [Config.parse(m.group(1))
                 for line in value.split('\n')
                 if line.startswith("displayplacer")
                 for m in P_CONF.finditer(line)]
-        return Layout(configs)
+        return Layout(configs, name)
 
     @property
     def footprint(self):
@@ -70,13 +71,13 @@ class Layout:
     def run(self):
         subprocess.run(self.to_command(), shell=True, check=True)
 
-    def switch(self, template_layouts):
-        if self.footprint == template_layouts[0].footprint:
+    def switch(self, template_items):
+        if self.footprint == template_items[0].footprint:
             print("switch to 1", file=sys.stderr)
-            self.configs = template_layouts[1].configs
+            self.configs = template_items[1].configs
         else:
             print("switch to 0", file=sys.stderr)
-            self.configs = template_layouts[0].configs
+            self.configs = template_items[0].configs
 
 
 class Template:
@@ -90,35 +91,40 @@ class Template:
             f.write("\n")
 
     def load(self):
-        return [Layout.parse(l) for l in self.load_raw()]
+        return [Layout.parse(raw, name) for name, raw in self.load_raw()]
 
     def load_raw(self):
         if self._template_path.exists():
             with self._template_path.open() as f:
-                for l in f.readlines():
-                    if l.strip():
-                        yield l
+                for i, l in enumerate(f.readlines()):
+                    if "|" in l:
+                        name, l = l.split('|', 2)
+                    else:
+                        name = f"Layout {i}"
+                    yield name.strip(), l.strip()
 
 
 def alfred_script_filter(template: Template):
-    items = [
-        {
-            "title": "Auto Switch",
-            "subtitle": "Auto switch based on the current config",
-            "arg": "!",
-            "autocomplete": "auto"
-        }
-    ] + [
-        {
-            "title": f"Config {i}",
-            "subtitle": raw,
-            "arg": raw,
-            "autocomplete": i
-        }
-        for i, raw in enumerate(template.load_raw())
-    ]
+    alfred_json = {
+        "items": [
+            {
+                "title": "Auto Switch",
+                "subtitle": "Auto switch based on the current config",
+                "arg": "!",
+                "autocomplete": "auto"
+            }
+        ] + [
+            {
+                "title": name,
+                "subtitle": raw,
+                "arg": raw,
+                "autocomplete": name
+            }
+            for name, raw in template.load_raw()
+        ]
+    }
 
-    print(json.dumps({"items": items}))
+    print(json.dumps(alfred_json))
 
 
 def parse_args():
@@ -141,8 +147,8 @@ def main():
     elif args.save:
         template.save(layout)
     else:
-        template_layouts = template.load()
-        layout.switch(template_layouts)
+        template_items = template.load()
+        layout.switch(template_items)
         print(layout.to_command())
         if not args.print_only:
             layout.run()
@@ -150,4 +156,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
