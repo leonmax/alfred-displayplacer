@@ -8,7 +8,7 @@ import subprocess
 import sys
 from pathlib import Path
 from dataclasses import dataclass
-from typing import Iterator, Tuple, List
+from typing import Iterator, Tuple, List, Optional
 
 CONF_DIR = os.path.expanduser("~/.config/dp")
 P_CONF = re.compile(r'"([^"]+)"', re.IGNORECASE)
@@ -27,6 +27,7 @@ class Config:
     color_depth: int = -1
     scaling: bool = False
     degree: int = 0
+    enabled: bool = True
 
     def to_conf(self):
         result = f"id:{self.id_}"
@@ -51,7 +52,7 @@ class Layout:
     Layout is a group of configs
     """
     configs: List[Config]
-    name: str = None
+    name: Optional[str] = None
 
     @staticmethod
     def parse(value, name=None):
@@ -92,7 +93,7 @@ class Layout:
 class Template:
     def __init__(self, template_file) -> None:
         self._template_path = Path(template_file).expanduser()
-        
+
     def save(self, layout: Layout, name=None):
         self._template_path.parent.mkdir(parents=True, exist_ok=True)
         with self._template_path.open('a') as f:
